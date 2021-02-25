@@ -31,5 +31,12 @@ module App
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    config.middleware.use Warden::Manager do |manager|
+      # default_strategies は複数指定可能
+      # 順番に実行されて、halt! されるまで続けられる
+      manager.default_strategies :authentication_token
+      manager.failure_app = ->(env) { ['401', {'Content-Type' => 'application/json'}, ["failure auth"]]}
+      # scope はどうすれば良いか要調査
+    end
   end
 end
